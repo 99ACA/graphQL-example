@@ -1,3 +1,5 @@
+const packageInfo = require('../../package.json');
+
 import * as Joi from "joi"
 import * as path from "path"
 import { config } from "dotenv";
@@ -14,8 +16,8 @@ function getServiceConfig() {
     try {
         loadDotEnvConfigFile(prefix)
     } catch (err) {
-        console.error(`Error while reading dynamic parameters from the environment ${prefix}`)
-        throw err
+        console.error(`Error while reading dynamic parameters from the environment ${prefix}`,err);
+        process.exit(1);
     }
 
     let restrictSchemaValues = getRestrictSchemaValues();
@@ -36,7 +38,10 @@ function getDefaultSchemaValues() {
 
     return {
         port: values.PORT as number,
-        NODE_ENV: values.NODE_ENV as string
+        NODE_ENV: values.NODE_ENV as string,
+        // Additinal fields from package.json
+        name : packageInfo.name as string,
+        version : packageInfo.version as string,
     }
 }
 function getRestrictSchemaValues() {
@@ -49,10 +54,11 @@ function getRestrictSchemaValues() {
 
     }
 }
-function validateAndGetValues(schema:ObjectSchema) {
-    let validate = schema.validate(process.env,{allowUnknown: true})
+function validateAndGetValues(schema:ObjectSchema, allowUnknown: boolean = true) {
+    let validate = schema.validate(process.env,{allowUnknown})
     if (validate.error) {
-        throw new Error(`Config validation error: ${validate.error.message}`);
+        console.error(`Config validation error: ${validate.error.message}`);
+        process.exit(1);
     }
     return validate.value
 }
@@ -70,8 +76,8 @@ function loadDotEnvConfigFile(prefix: string) {
     }
 }
 
-const serviceConfig = getServiceConfig()
+const ServiceConfig = getServiceConfig()
 
 export {
-    serviceConfig
+    ServiceConfig
 }

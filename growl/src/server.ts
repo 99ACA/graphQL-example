@@ -1,5 +1,4 @@
-import { serviceConfig } from './common/config'
-import { ServiceName } from './common/service-info'
+import { ServiceConfig } from './common/config'
 import path from 'path'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge'
@@ -20,8 +19,8 @@ export class Server {
     constructor() {
         this.app = express()
         this.httpServer = http.createServer(this.app)
-        this.port = serviceConfig.port;
-        this.graphqlPath =  `/${ServiceName}/`
+        this.port = ServiceConfig.port;
+        this.graphqlPath =  `/${ServiceConfig.name}/`
     }
 
     public async listen() {
