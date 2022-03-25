@@ -1,4 +1,3 @@
-require('./common/on-process-load')
 import { Server } from "./server";
 
 let server = new Server()

@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "growl/",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "Growl Build",
+			"detail": "yarn run build:config && yarn run build:graphql && tsc"
+		}
+	]
+}

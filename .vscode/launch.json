@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Growl",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/growl/src/index.ts",
+            "cwd": "${workspaceFolder}/growl",
+            "runtimeVersion": "14", //NVM
+            "skipFiles": [
+                "<node_internals>/**/*.js"
+            ],
+            "env": {
+                "NODE_ENV": "test"
+            },
+            "outFiles": [
+                "${workspaceFolder}/growl/dist/**/*.js"
+            ]
+        },
+]
+}
