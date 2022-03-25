@@ -1,0 +1,14 @@
+---
+version: "3"
+services:
+  redis:
+    image: redis
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    networks:
+      - basic-project-network
+networks:
+  basic-project-network:
+    driver: bridge

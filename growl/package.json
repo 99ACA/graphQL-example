@@ -1,0 +1,34 @@
+{
+  "name": "growl",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "start:dev": "yarn run build:dev",
+    "build:dev": "nodemon 'src/index.ts' --exec 'ts-node' src/index.ts -e ts,graphql",
+    "debug:graphql": "cpx 'src/graphql/schemas/**/*.graphql' ./dist/graphql/schemas/ -w -v",
+    "debug": "concurrently \"tsc -w\" \"yarn run debug:graphql\" \"nodemon --inspect ./dist/index.js\"",
+    "-- Build -- ": "",
+    "build": "yarn run build:config && yarn run build:graphql && tsc",
+    "build:config": "cpx '.*.env' ./dist/ -v",
+    "build:graphql": "cpx 'src/graphql/schemas/**/*.graphql' ./dist/graphql/schemas/ -v"
+  },
+  "dependencies": {
+    "@graphql-tools/load-files": "^6.5.3",
+    "@graphql-tools/merge": "^8.2.4",
+    "apollo-server-core": "^3.6.3",
+    "apollo-server-express": "^3.6.3",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "graphql": "^16.3.0"
+  },
+  "devDependencies": {
+    "@types/nodemon": "^1.19.1",
+    "concurrently": "^7.0.0",
+    "cpx": "^1.5.0",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5"
+  }
+}
