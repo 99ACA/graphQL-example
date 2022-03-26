@@ -20,3 +20,13 @@ Example of graphql using apollo
 
 
   -  [health checks - ](https://www.apollographql.com/docs/apollo-server/monitoring/health-checks/#http-level-health-checks)  `http://localhost:14011/.well-known/apollo/server-health`
+
+
+## Tasks List
+ - [X] .env (in develop & testing)
+ - [ ] Logger
+ - [ ] Authorizations & Permissions
+ - [ ] N + 1 Probelm
+ - [ ] Cache
+ - [ ] Testing
+ - [ ] Mocks

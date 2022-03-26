@@ -29,11 +29,3 @@ function onSignal(signal: string) {
 }
 
 void main()
-
-
-// Tasks
-// - logger
-// - Authorizations & Permissions
-// - N + 1 Probelm
-// - Cache 
-

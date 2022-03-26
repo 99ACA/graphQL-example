@@ -29,6 +29,9 @@ function getServiceConfig() {
 }
 
 function getDefaultSchemaValues() {
+    /**
+     * Entire parameters that have also default value, in case there not exist
+     */
     const schema = Joi.object({
         NODE_ENV: Joi.string().valid('development', 'staging', 'production', 'test').default('development'),
         HOST: Joi.string().default('0.0.0.0'),
@@ -45,6 +48,9 @@ function getDefaultSchemaValues() {
     }
 }
 function getRestrictSchemaValues() {
+    /**
+     * Entire parameters that should be define
+     */
     const schema = Joi.object({
 
     })
@@ -63,16 +69,22 @@ function validateAndGetValues(schema:ObjectSchema, allowUnknown: boolean = true)
     return validate.value
 }
 
-function loadDotEnvConfigFile(prefix: string) {
-    console.info(`Going to try load the configuration from file name - .${prefix}.env`)
-    let configPath = path.join(__dirname, './..', `.${prefix.toLowerCase()}.env`)
-    if (!fs.existsSync(configPath)) { // running with nodemon
-        configPath = path.join(__dirname, './../..', `.${prefix.toLowerCase()}.env`)
-    }
-    let env = config({ path: configPath });
-    if (env.error) {
-        console.error(`Error while read the configuration file. ${env.error}`)
-        throw env.error
+function loadDotEnvConfigFile(prefix: string ='') {
+    /**
+     * Load the configuration file only in development/test
+     **/
+    if (process.env.NODE_ENV === undefined || process.env.NODE_ENV in ['development','test']){
+        let fileName = prefix === '' ? '.env' : `.${prefix.toLowerCase()}.env`
+        console.info(`Going to try load the configuration from file name - ${fileName}`)
+        let configPath = path.join(__dirname, './..', fileName)
+        if (!fs.existsSync(configPath)) { // running with nodemon
+            configPath = path.join(__dirname, './../..', fileName)
+        }
+        let env = config({ path: configPath });
+        if (env.error) {
+            console.error(`Error while read the configuration file. ${env.error}`)
+            throw env.error
+        }
     }
 }
 
