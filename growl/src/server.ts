@@ -1,12 +1,20 @@
-import { ServiceConfig } from './common/config'
 import path from 'path'
+import express from 'express'
+import http from 'http'
+
+import * as bodyParser from "body-parser"
+import compression from "compression"
+import helmet from "helmet"
+
 import { loadFilesSync } from '@graphql-tools/load-files'
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 
 import { ApolloServer } from 'apollo-server-express'
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
-import express from 'express'
-import http from 'http'
+
+import { ServiceConfig } from './common/config'
+import type { GraphQLSchema } from 'graphql/type'
 
 export class Server {
     // expose for testing
@@ -18,6 +26,19 @@ export class Server {
 
     constructor() {
         this.app = express()
+        this.app.disable('x-powered-by')
+        let isDevelopment = process.env.NODE_ENV === 'development'
+
+        // this.app.use(helmet({
+        //                 crossOriginEmbedderPolicy: !isDevelopment,
+        //                 contentSecurityPolicy: !isDevelopment
+        // })); // Security
+        this.app.use(compression())
+        this.app.use(bodyParser.json()) // support json encoded bodies
+        this.app.use(bodyParser.urlencoded({ extended: true })) // support encoded bodies
+        
+
+
         this.httpServer = http.createServer(this.app)
         this.port = ServiceConfig.port;
         this.graphqlPath =  `/${ServiceConfig.name}/`
@@ -54,7 +75,7 @@ export class Server {
         }
     }
 
-    private getApolloServer = (): ApolloServer => {
+    private getApolloExecutableSchema():GraphQLSchema{
         // More information https://www.graphql-tools.com/docs/schema-merging
 
         // Load schema types
@@ -64,17 +85,34 @@ export class Server {
         let loadedresolversFiles = loadFilesSync(path.join(__dirname, './graphql/resolvers/**/*.*')) // include js/ts
         let mergeResolver = mergeResolvers(loadedresolversFiles)
 
-        // More information about the options - https://master--apollo-server-docs.netlify.app/docs/apollo-server/api/apollo-server/
-        return new ApolloServer({            
+        return makeExecutableSchema({
             typeDefs: mergeType, // representations of GraphQL schema in the Schema Definition Language (SDL) 
             resolvers: mergeResolver,
+            // schemaDirectives,
+        })
+    }
+    private getApolloServer = (): ApolloServer => {
+
+        let schema:GraphQLSchema = this.getApolloExecutableSchema();
+        
+        // More information about the options - https://master--apollo-server-docs.netlify.app/docs/apollo-server/api/apollo-server/
+        return new ApolloServer({            
+            schema,
             // context:   //An object or function called with the current request that creates the context shared across all resolvers
 
             // logger:    // 
             // formatError:   // Functions to format the errors and response returned from the server 
             // subscriptions: 
             // persistedQueries: 
-            plugins: [ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer })],
+            plugins: [
+                ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
+                /* This plugin is defined in-line. */
+                {
+                    async serverWillStart() {
+                        console.log('GraphQL server starting up.');
+                    },
+                }
+            ],
         })
     }
 
@@ -95,3 +133,4 @@ export class Server {
     }
 
 }
+
